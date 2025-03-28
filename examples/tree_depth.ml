@@ -10,7 +10,6 @@ let rec depth root =
   | Leaf -> 0
   | Node (l,r) -> 1 + max (depth l) (depth r) 
 
-(* cps max *)
 let maxk x y k = if x >= y then k x else k y
 
 let rec depthk root k =

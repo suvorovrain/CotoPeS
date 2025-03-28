@@ -1,6 +1,0 @@
-(library
- (name ex)
-(preprocess
-  (pps ppx_expect ppx_deriving_qcheck))
- (instrumentation
-  (backend bisect_ppx)))
