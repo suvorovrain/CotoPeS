@@ -13,6 +13,7 @@ let rec depth root =
 
 (* поиск наибольшего из двух чисел в CPS-стиле *)
 
+  (* CPS *)
 let maxk x y k = if x >= y then k x else k y
 
 (* поиск глубины в CPS-стиле *)
