@@ -35,11 +35,11 @@ let size root =
 
 (* тут просто взяли и расписали let через применение. 025pacomb.pdf слайд 14 *)
 (* можно ввести let* и переписать с ними *)
-let rec makek : 'a. int -> (tree -> 'a ) -> 'a =
+let rec makek =
   (fun depth k ->
   if depth <= 0 then k Leaf
   else 
-    (fun r -> (fun l -> k (Node (l,r))) (if depth = 2 then r else Leaf) ) (makek (depth-1) Fun.id))
+    makek (depth-1) (fun r -> (fun l -> k (Node (l,r))) (if depth = 2 then r else Leaf) ))
 
 
 let rec sizek root k = 
