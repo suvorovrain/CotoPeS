@@ -39,7 +39,7 @@ let rec makek : 'a. int -> (tree -> 'a ) -> 'a =
   (fun depth k ->
   if depth <= 0 then k Leaf
   else 
-    (fun r -> (fun l -> k (Node (l,r))) (if depth = 2 then r else Leaf) ) (makek (depth-1) (fun x -> x)))
+    (fun r -> (fun l -> k (Node (l,r))) (if depth = 2 then r else Leaf) ) (makek (depth-1) Fun.id))
 
 
 let rec sizek root k = 
@@ -66,6 +66,6 @@ let%expect_test _ = print_clean_vertical (make 4);
 let%expect_test _ = print_int (size (make 4));
 [%expect{|
   5 |}]
-let%expect_test _ = print_int (size (makek 4 (fun x -> x)));
+let%expect_test _ = print_int (size (makek 4 Fun.id));
 [%expect{|
   5 |}]
