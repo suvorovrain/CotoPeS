@@ -1,8 +1,0 @@
-(library
- (name test_ex) ; Your main library
- (public_name cotopes)
- (inline_tests) ; Enable ppx_expect
- (preprocess
-  (pps ppx_expect ppx_deriving_qcheck))
- (instrumentation
-  (backend bisect_ppx)))
