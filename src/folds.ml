@@ -44,7 +44,7 @@ let fold_right_cps1 f l accu =
   helper l Fun.id
 ;;
 
-(* CPS реализация правой свёртки, f записана в CPS *)
+(* CPS реализация правой свёртки, f записана в CPS. Требовалось на экзамене (какой-то попытке) в 2024 *)
 let fold_right_cps2 f l accu =
   let rec helper xs k =
     match xs with
@@ -53,8 +53,6 @@ let fold_right_cps2 f l accu =
   in
   helper l Fun.id
 ;;
-
-(* На какой-то из попыток сдачи 2024 нужно было останавливать вычисления в разных случаях. Например встретили 0 при свёртке умножением. Это пока под вопросом *)
 
 let%expect_test "Default fold_left" =
   print_int (fold_left ( + ) 0 [ 1; 2; 3 ]);
