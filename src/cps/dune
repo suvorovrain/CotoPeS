@@ -1,0 +1,8 @@
+(library
+ (name cps)
+ (public_name cotopes.cps)
+ (inline_tests)
+ (preprocess
+  (pps ppx_expect ppx_deriving_qcheck))
+ (instrumentation
+  (backend bisect_ppx)))
