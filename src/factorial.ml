@@ -15,3 +15,9 @@ let%expect_test "Factorial CPS" =
   print_int (factk 5 Fun.id);
   [%expect {| 120 |}]
 ;;
+
+let%expect_test "Simple factorial on big number" =
+  (try print_int (fact 10000000) with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| Stack overflow! |}]
+;;

@@ -10,3 +10,10 @@ let%expect_test "Common Fibonacci" = print_int (fib 5);
 
 let%expect_test "Sigma Fibonacci" = print_int (fibk 30 Fun.id);
 [%expect{| 1346269 |}]
+
+let%expect_test "Common Fibonacci on big number" =
+  (try print_int (fib 10000000) with
+  | Stack_overflow ->
+    print_endline "Stack overflow!");
+    [%expect {| Stack overflow! |}]
+;;

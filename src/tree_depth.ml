@@ -13,7 +13,7 @@ let rec depth root =
 
 (* поиск наибольшего из двух чисел в CPS-стиле *)
 
-  (* CPS *)
+(* CPS *)
 let maxk x y k = if x >= y then k x else k y
 
 (* поиск глубины в CPS-стиле *)
@@ -35,4 +35,23 @@ let%expect_test "Simple depth evaluating" =
 let%expect_test "CPS depth evaluating" =
   print_int (depthk test_tree Fun.id);
   [%expect {| 3 |}]
+;;
+
+let huge_tree depth =
+  let rec helperk depth k =
+    if depth = 0 then k Leaf else helperk (depth - 1) (fun tree -> k (Node (tree, Leaf)))
+  in
+  helperk depth Fun.id
+;;
+
+let%expect_test "Simple depth on huge tree" =
+  (try print_endline (string_of_int (depth (huge_tree 1000000))) with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| Stack overflow! |}]
+;;
+
+let%expect_test "Huge tree" =
+  (try print_endline (string_of_int (depthk (huge_tree 1000000) Fun.id)) with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| 1000000 |}]
 ;;

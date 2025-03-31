@@ -30,3 +30,21 @@ let%expect_test "CPS size evaluating" =
   print_endline (string_of_int (sizek test_tree Fun.id));
   [%expect {| 4 |}]
 ;;
+
+let huge_tree depth =
+  let rec helperk depth k =
+    if depth = 0 then k Leaf else helperk (depth - 1) (fun tree -> k (Node (tree, Leaf)))
+  in
+  helperk depth Fun.id
+;;
+
+let%expect_test "Simple size on huge tree" =
+  (try print_int (size (huge_tree 1000000)) with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| Stack overflow! |}]
+;;
+
+let%expect_test "CPS size evaluating on huge tree" =
+  print_int (sizek (huge_tree 1000000) Fun.id);
+  [%expect {| 1000000 |}]
+;;
