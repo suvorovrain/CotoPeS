@@ -12,7 +12,7 @@ let fold_left_cps1 f accu l =
   let rec helper xs k =
     match xs with
     | [] -> k accu
-    | hd :: tl -> helper tl (fun acc -> k (f (f accu hd) acc))
+    | hd :: tl -> helper tl (fun acc -> k (f acc hd))
   in
   helper l Fun.id
 ;;
