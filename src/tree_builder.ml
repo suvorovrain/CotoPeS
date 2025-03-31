@@ -35,7 +35,7 @@ let size root =
 
 (* тут просто взяли и расписали let через применение. 025pacomb.pdf слайд 14 + перевернули малеьнко туда сюда*)
 (* можно ввести let* и переписать с ними *)
-(* а еще let let l = if depth = 2 then r else Leaf можно не перписывать в апплай*)
+(* а еще let l = if depth = 2 then r else Leaf можно не перписывать в апплай*)
 let rec makek =
   (fun depth k ->
   if depth <= 0 then k Leaf
