@@ -1,7 +1,7 @@
 (library
- (name test_ex) ; Your main library
- (public_name cotopes)
- (inline_tests) ; Enable ppx_expect
+ (name memoi)
+ (public_name cotopes.memoi)
+ (inline_tests)
  (preprocess
   (pps ppx_expect ppx_deriving_qcheck))
  (instrumentation
