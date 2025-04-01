@@ -113,13 +113,13 @@ let%expect_test "fold left list" =
   (try
     print_string  (fold_right_cps2 fk list "" Fun.id )
   with | Stack_overflow -> print_endline "Stack overflow!");
-  [%expect {| 1234 |}] 
+  [%expect {| 4321 |}] 
 
   let%expect_test "fold right cps2 (with helper) list" = 
   (try
     print_string  (fold_right_cps2_wh fk list "")
   with | Stack_overflow -> print_endline "Stack overflow!");
-  [%expect {| 1234 |}] 
+  [%expect {| 4321 |}] 
 
   (* проверка на stack overflow*)
    
