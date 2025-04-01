@@ -39,11 +39,19 @@ let fold_right_cps1 f l accu =
   helper l Fun.id
 ;;
 
-(* cps fold_right with cps f*)
 let rec fold_right_cps2 f l accu k =
-  match l with 
-  | [] -> k accu
-  | hd :: tl -> f hd accu (fun s1 -> fold_right_cps2 f tl s1 k)
+    match l with 
+    | [] -> k accu
+    | hd :: tl -> fold_right_cps2 f tl accu (fun res_tail -> f hd res_tail k)
+
+let fold_right_cps2_wh f l accu = 
+    let rec helper xs k = 
+        match xs with
+        | [] -> k accu
+        | hd :: tl -> helper tl (fun res_tail -> f hd res_tail k)
+    in 
+    helper l Fun.id
+;;
 
 (*Наблюдение: можно делать через helper, можно без него. Как упражнение, можете
 переписать то, что написано через helper, без него*)
@@ -104,6 +112,12 @@ let%expect_test "fold left list" =
   let%expect_test "fold right cps2 list" = 
   (try
     print_string  (fold_right_cps2 fk list "" Fun.id )
+  with | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| 1234 |}] 
+
+  let%expect_test "fold right cps2 (with helper) list" = 
+  (try
+    print_string  (fold_right_cps2_wh fk list "")
   with | Stack_overflow -> print_endline "Stack overflow!");
   [%expect {| 1234 |}] 
 
