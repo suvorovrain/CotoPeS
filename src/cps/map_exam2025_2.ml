@@ -5,6 +5,15 @@ let print_list ~print_element list =
   List.iter (fun x -> print_element x; print_string " ") list;
   print_newline ()
 
+let print_list_n ~print_element n list =
+  let rec take n = function
+    | [] -> []
+    | _ when n <= 0 -> []
+    | x :: xs -> x :: take (n - 1) xs in
+  List.iter (fun x -> print_element x; print_string " ") (take n list);
+  print_newline ()
+;;
+
 (* обычная мапа, в обратном порядке *)
 let rec map f xs acc =
   match xs with
