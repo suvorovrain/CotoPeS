@@ -48,5 +48,5 @@ let%expect_test "Eval huge expression" =
   | Stack_overflow ->
     print_endline "Stack overflow!";
     [%expect.unreachable];
-  [%expect {| Success! Sum: 1000000 |}]
+    [%expect {| Success! Sum: 1000000 |}]
 ;;

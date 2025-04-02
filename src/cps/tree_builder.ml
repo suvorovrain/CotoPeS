@@ -1,35 +1,39 @@
 (* помните мультик боб строитель? *)
 (* так вот это цпс для строителя деревьев. *)
 type tree =
-| Leaf
-| Node of tree * tree
+  | Leaf
+  | Node of tree * tree
 
 let print_clean_vertical tree =
   let rec print_node indent is_last = function
-    | Leaf -> 
-        Printf.printf "%s%sLeaf\n" indent (if is_last then "\\_" else "| ")
+    | Leaf -> Printf.printf "%s%sLeaf\n" indent (if is_last then "\\_" else "| ")
     | Node (l, r) ->
-        Printf.printf "%s%sNode\n" indent (if is_last then "\\_" else "| ");
-        let new_indent = indent ^ (if is_last then "  " else "| ") in
-        print_node new_indent false l;
-        print_node new_indent true r
+      Printf.printf "%s%sNode\n" indent (if is_last then "\\_" else "| ");
+      let new_indent = indent ^ if is_last then "  " else "| " in
+      print_node new_indent false l;
+      print_node new_indent true r
   in
   print_node "" true tree
+;;
 
 (* в оригинале тут было дерево, которое разделялось через каждые 1000000 узлов, но mod в цпс переписывать не хочу, поэтому depth = 2  *)
 let rec make depth =
-  if depth <= 0 then Leaf
-  else 
+  if depth <= 0
+  then Leaf
+  else (
     let r = make (depth - 1) in
     let l = if depth = 2 then r else Leaf in
-    Node (l,r)
+    Node (l, r))
+;;
 
-let size root = 
-  let rec helper tree = 
-  match tree with
+let size root =
+  let rec helper tree =
+    match tree with
     | Leaf -> 0
     | Node (l, r) -> 1 + helper l + helper r
-    in helper root
+  in
+  helper root
+;;
 
 (* CPS *)
 
@@ -37,20 +41,24 @@ let size root =
 (* можно ввести let* и переписать с ними *)
 (* а еще let l = if depth = 2 then r else Leaf можно не перписывать в апплай*)
 let rec makek =
-  (fun depth k ->
-  if depth <= 0 then k Leaf
-  else 
-    makek (depth-1) (fun r -> (fun l -> k (Node (l,r))) (if depth = 2 then r else Leaf) ))
+  fun depth k ->
+  if depth <= 0
+  then k Leaf
+  else
+    makek (depth - 1) (fun r ->
+      (fun l -> k (Node (l, r))) (if depth = 2 then r else Leaf))
+;;
 
-
-let rec sizek root k = 
+let rec sizek root k =
   match root with
   | Leaf -> k 0
-  | Node(l,r) -> sizek l (fun s1 -> sizek r (fun s2 -> k (s1 + s2 + 1)))
+  | Node (l, r) -> sizek l (fun s1 -> sizek r (fun s2 -> k (s1 + s2 + 1)))
+;;
 
-
-let%expect_test _ = print_clean_vertical (make 8);
-[%expect{|
+let%expect_test _ =
+  print_clean_vertical (make 8);
+  [%expect
+    {|
   \_Node
     | Leaf
     \_Node
@@ -70,11 +78,18 @@ let%expect_test _ = print_clean_vertical (make 8);
                 \_Node
                   | Leaf
                   \_Leaf |}]
+;;
 
-
-let%expect_test _ = print_int (size (make 4));
-[%expect{|
+let%expect_test _ =
+  print_int (size (make 4));
+  [%expect
+    {|
   5 |}]
-let%expect_test _ = print_int (sizek (makek 43334534 Fun.id) Fun.id);
-[%expect{|
+;;
+
+let%expect_test _ =
+  print_int (sizek (makek 43334534 Fun.id) Fun.id);
+  [%expect
+    {|
   43334535 |}]
+;;
