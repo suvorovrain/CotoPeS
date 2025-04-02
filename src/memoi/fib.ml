@@ -1,34 +1,136 @@
+(* memoize принимает функцию и возвращает функцию с таким же типом *)
+let memoize: ('a -> 'b) -> 'a -> 'b = fun f -> 
+  let open Base in
 
-(* val memoize : ('a -> 'b) -> 'a -> 'b *)
-let memoize f =
-let table = Hashtbl.create 42 (* size *) in
-(fun key ->
-match Hashtbl.find table key with
-| rez -> rez
-| exception Not_found ->
-let rez = f key in
-Hashtbl.add table key rez;
-rez
-)
-(* val memoize2 : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b *)
-let memoize2 f =
-let h = Hashtbl.create 42 (* size *) in
-let rec g x =
-match Hashtbl.find h x with
-| rez -> rez
-| exception Not_found ->
-let rez = f g x in
-Hashtbl.add h x rez;
-rez
-in
-g
+	(* создаём таблицу где будем сохранять результаты *)
+  let table = Hashtbl.Poly.create () in
+  let new_fun x =
+    match Hashtbl.find table x with
+		(* нашли в таблице вернём, то что нашли*)
+    | Some y -> y
+		
+		(* не нашли *)
+    | None ->
+			(* посчитали *)
+      let y = f x in
+			(* добавили в таблицу *)
+      Hashtbl.add_exn table ~key:x ~data:y;
+		  (* вернули посчитанное значение *)
+      y
+  in
+  new_fun
 
-(* let rec fib n =
-  if n<2 then n else fib (n-1) + fib (n-2) ;; *)
-let fib_open self n =
-  if n <= 1 then 1 else self (n - 1) + self (n - 2) ;;
-  let rec fib n = fib_open fib n ;;
-  let fib = memoize fib ;;
-  let fib2 = memoize2 fib_open ;;
-  let res1 = fib 30 (* slow *)
-  let res2 = fib2 30 (* faster *)
+let rec fibo n = 
+  if n <= 1 then n 
+  else fibo (n-1) + fibo (n-2)
+
+let memoize: ('a -> 'b) -> ('a -> 'b) = fun f ->
+  let open Base in
+  let table = Hashtbl.Poly.create() in
+  let new_fun x =
+    match Hashtbl.find table x with 
+    | Some x -> x
+    | None -> 
+      let y = f x in
+      Hashtbl.add_exn table ~key:x ~data:y;
+      y
+  in 
+  new_fun
+;;
+
+
+(*функция для замера для наглядности сам придумал*)
+let time_it f x =
+  let start = Sys.time () in
+  let result = f x in
+  let finish = Sys.time () in
+  Printf.printf "Execution time: %fs\n" (finish -. start);
+  result
+;;
+
+(*это мемоизация для открытых рекурсий вся соль в том что *)
+let memo_rec : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b =
+  fun f ->
+  let open Base in
+  let table = Hashtbl.Poly.create () in
+  let rec new_fun x =
+    match Hashtbl.find table x with
+    | Some y -> y
+    | None ->
+      (*мы вот тут передаем в функцию именно new_fun которая уже в дальнейшем будет мемоизировать каждый рекурсивынй вызов
+      и у которой в замыкании уже лежит hashmap*)
+      let y = f new_fun x in
+      Hashtbl.add_exn table ~key:x ~data:y;
+      y
+  in  
+  new_fun
+;;
+
+let fib_open self n = 
+  if n <= 1 then 1 
+  else self (n - 1) + self (n - 2)
+
+
+let fib_opt = memo_rec fib_open
+
+let mem_fib = memoize fibo in
+
+
+
+(*тут можно запустить потыкаться, будет видно что 50 впервый раз у всех будет работать минуту,
+ затем повторно у мемоизированных будет рабоать за 0~ а вот у обычной опять минуту*)
+ (*при этом в третий раз мемоизация на 49 только у оптимизированного мемоийза будет быстро тк простой не сохранял все рекурсивные вызовы*)
+(*
+let () = 
+  Printf.printf "Memoized\n";
+  Printf.printf "%d\n" (time_it mem_fib 50);
+  Printf.printf "NotMemoized\n";
+  Printf.printf "%d\n" (time_it fibo 50);
+  Printf.printf "OptaimalMemoized\n";
+  Printf.printf "%d\n" (time_it fib_opt 50);
+
+  Printf.printf "Memoized second time\n";
+  Printf.printf "%d\n" (time_it mem_fib 50);
+  Printf.printf "NotMemoized\n";
+  Printf.printf "%d\n" (time_it fibo 50);
+  Printf.printf "OptaimalMemoized\n";
+  Printf.printf "%d\n" (time_it fib_opt 50);
+
+  Printf.printf "Memoized third time\n "; 
+  Printf.printf "%d\n" (time_it mem_fib 49);
+  Printf.printf "NotMemoized\n";
+  Printf.printf "%d\n" (time_it fibo 49);
+  Printf.printf "OptaimalMemoized\n";
+  Printf.printf "%d\n" (time_it fib_opt 49);
+
+```
+*)
+
+
+(*факториал*)
+let factorial_open self n = 
+  if n <= 1 then 1  
+  else n * self (n - 1)
+
+let fact_opt = memo_rec factorial_open
+
+(*сумма чисел от одного до n  *)
+let sum_open self n =
+  if n = 0 then 0
+  else n + self (n - 1)
+
+let memo_sum = memo_rec sum_open
+
+(*проверка числа на простоту*)
+let is_prime_open self n =
+  if n <= 1 then false
+  else if n = 2 then true
+  else 
+    let rec check i = 
+      if i * i > n then true
+      else if n mod i = 0 then false
+      else check (i + 1)
+    in
+    check 2
+
+let memo_is_prime = memo_rec is_prime_open
