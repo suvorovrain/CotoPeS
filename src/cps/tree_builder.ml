@@ -35,7 +35,7 @@ let size root =
 
 (* тут просто взяли и расписали let через применение. 025pacomb.pdf слайд 14 + перевернули малеьнко туда сюда*)
 (* можно ввести let* и переписать с ними *)
-(* а еще let let l = if depth = 2 then r else Leaf можно не перписывать в апплай*)
+(* а еще let l = if depth = 2 then r else Leaf можно не перписывать в апплай*)
 let rec makek =
   (fun depth k ->
   if depth <= 0 then k Leaf
@@ -49,24 +49,32 @@ let rec sizek root k =
   | Node(l,r) -> sizek l (fun s1 -> sizek r (fun s2 -> k (s1 + s2 + 1)))
 
 
-let%expect_test _ = print_clean_vertical (make 4);
+let%expect_test _ = print_clean_vertical (make 8);
 [%expect{|
   \_Node
     | Leaf
     \_Node
       | Leaf
       \_Node
-        | Node
-        | | Leaf
-        | \_Leaf
+        | Leaf
         \_Node
           | Leaf
-          \_Leaf |}]
+          \_Node
+            | Leaf
+            \_Node
+              | Leaf
+              \_Node
+                | Node
+                | | Leaf
+                | \_Leaf
+                \_Node
+                  | Leaf
+                  \_Leaf |}]
 
 
 let%expect_test _ = print_int (size (make 4));
 [%expect{|
   5 |}]
-let%expect_test _ = print_int (size (makek 4 Fun.id));
+let%expect_test _ = print_int (sizek (makek 43334534 Fun.id) Fun.id);
 [%expect{|
-  5 |}]
+  43334535 |}]

@@ -1,6 +1,6 @@
 (library
- (name cps)
- (public_name cotopes.cps)
+ (name memoi)
+ (public_name cotopes.memoi)
  (inline_tests)
  (preprocess
   (pps ppx_expect ppx_deriving_qcheck))
