@@ -10,6 +10,8 @@ description: A reference page in my new Starlight docs site.
 
 Про это всё наша методичка.
 
+Автор текста - [Homka122](https://t.me/homka122)
+
 Для начала рассмотрим хвостые функции и какую они роль играют.
 
 ## Хвостовые функции
