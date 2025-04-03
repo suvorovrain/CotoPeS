@@ -1,4 +1,5 @@
-(* memoize принимает функцию и возвращает функцию с таким же типом *)
+(*принимает функцию из 'a->'b, возвращает функцию того же типа*)
+(* val memoize : ('a -> 'b) -> 'a -> 'b *)
 let memoize: ('a -> 'b) -> 'a -> 'b = fun f -> 
   let open Base in
 
@@ -19,26 +20,13 @@ let memoize: ('a -> 'b) -> 'a -> 'b = fun f ->
       y
   in
   new_fun
+  ;;
+
 
 let rec fibo n = 
   if n <= 1 then n 
   else fibo (n-1) + fibo (n-2)
-
-let memoize: ('a -> 'b) -> ('a -> 'b) = fun f ->
-  let open Base in
-  let table = Hashtbl.Poly.create() in
-  let new_fun x =
-    match Hashtbl.find table x with 
-    | Some x -> x
-    | None -> 
-      let y = f x in
-      Hashtbl.add_exn table ~key:x ~data:y;
-      y
-  in 
-  new_fun
-;;
-
-
+  
 (*функция для замера для наглядности сам придумал*)
 let time_it f x =
   let start = Sys.time () in
@@ -48,6 +36,7 @@ let time_it f x =
   result
 ;;
 
+(*принимает функцию которая принимает функцию того же типа('a->'b), и возврашает функцию того же типа*)
 (*это мемоизация для открытых рекурсий вся соль в том что *)
 let memo_rec : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b =
   fun f ->
@@ -134,3 +123,4 @@ let is_prime_open self n =
     check 2
 
 let memo_is_prime = memo_rec is_prime_open
+
