@@ -1,13 +1,6 @@
 name: Build master
 
-on:
-    pull_request:
-        branches:
-            - "main"
-    push:
-        paths-ignore:
-            - "README.md"
-        branches: "*"
+on: [push, pull_request]
 env:
     OPAMROOT: /home/user/.opam
     OPAMYES: true
