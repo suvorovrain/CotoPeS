@@ -1,4 +1,4 @@
-name: Build master
+name: Build code
 
 on: [push, pull_request]
 env:
