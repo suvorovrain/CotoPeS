@@ -1,0 +1,40 @@
+name: Build master
+
+on:
+    pull_request:
+        branches:
+            - "main"
+    push:
+        paths-ignore:
+            - "README.md"
+        branches: "*"
+env:
+    OPAMROOT: /home/user/.opam
+    OPAMYES: true
+    OPAMCONFIRMLEVEL: unsafe-yes
+    latest: "./"
+jobs:
+    build:
+        defaults:
+            run:
+                shell: bash
+        runs-on: ubuntu-latest
+        container:
+            image: kakadu18/ocaml:fp2024
+        concurrency:
+            group: ${{ github.workflow }}-${{ github.ref }}
+            cancel-in-progress: true
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Installing dependencies for ${{ env.latest }}
+              run: cd ${{ env.latest }} && opam install . --deps-only --yes
+
+            - if: true
+              name: Checking ocamlformat
+              run: |
+                  cd ${{ env.latest }} && opam exec -- dune build @fmt --profile=release
