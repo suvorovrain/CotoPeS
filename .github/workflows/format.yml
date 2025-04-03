@@ -27,6 +27,9 @@ jobs:
             - name: Installing dependencies for ${{ env.latest }}
               run: cd ${{ env.latest }} && opam install . --deps-only --yes
 
+            - name: Мега костыль - Installing ocamlformat 0.27.0 for ${{ env.latest }}
+              run: cd ${{ env.latest }} && opam install ocamlformat.0.27.0 --yes
+
             - if: true
               name: Checking ocamlformat
               run: |
