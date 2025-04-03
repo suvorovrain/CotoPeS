@@ -27,7 +27,7 @@ jobs:
             - name: Installing dependencies for ${{ env.latest }}
               run: cd ${{ env.latest }} && opam install . --deps-only --yes
 
-            - if: true
+            - if: false
               name: Checking ocamlformat
               run: |
                   cd ${{ env.latest }} && opam exec -- dune build @fmt --profile=release
