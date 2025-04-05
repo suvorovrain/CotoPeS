@@ -44,12 +44,10 @@ let sum_n_ones n =
 ;;
 
 
-(*
 let%expect_test "Eval huge expression" =
-  try Printf.printf "Success! Sum: %d\n" (sum_n_ones 1_000_000) with
+  (try Printf.printf "Success! Sum: %d\n" (sum_n_ones 1_000_000) with
   | Stack_overflow ->
-    print_endline "Stack overflow!";
-    [%expect.unreachable];
+    print_endline "Stack overflow!");
+
   [%expect {| Success! Sum: 1000000 |}]
 ;;
-*)

@@ -77,15 +77,12 @@ let%expect_test "CPS map" =
 
 (* Слава попросил сделать тест что это чудо что я наваял не перегружает стек чтбы убедиться что оно действиетльно CPS*)
 (*запускаем нашу чудо функцию на листе из 10_000_000 единичек, факториалем их все считайте получаем те же 10_000_000 единичек, но стак оверфлоу мы не получили*)
-let%expect_test "non-cps map causes stack overflow" =
-  let huge_list = List.init 10_000_000 (fun _ -> 1) in
-  try
-    ignore (map fact huge_list [])
-  with
-    | Stack_overflow -> print_endline "Stack overflow!";
-  [%expect.unreachable]
+let%expect_test "default map huge list" =
+let huge_list = List.init 10_000_000 (fun _ -> 1) in
+  (try print_list_n ~print_element:print_int 5 (map fact huge_list []) with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| 1 1 1 1 1 |}]
 ;;
-
 
 let%expect_test "cps map handles large input safely" =
   let huge_list = List.init 10_000_000 (fun _ -> 1) in
