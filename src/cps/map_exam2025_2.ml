@@ -42,13 +42,12 @@ let mapk f l =
   helperk l Fun.id
 ;;
 
-(*Dabzelosiqqq:::: я сдела разворот без конкатенации списков - он по идее работает медленно так что это тоже самое что и выше только через аккумулятор
-ПУТИ КАКАДУ НЕИСПОВЕДИМЫ МЫ ВСЕ УМРЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕМ*)
+(*Dabzelosiqqq:::: я сдела разворот без конкатенации списков - он по идее работает медленно так что это тоже самое что и выше только через аккумулятор*)
 let map_cps_revk f l=
   let rec helper xs acc k =
     match xs with
     | [] -> k acc
-    | hd :: tl ->f hd (fun mapped_hd -> helper tl (mapped_hd :: acc) k)
+    | hd :: tl -> f hd (fun mapped_hd -> helper tl (mapped_hd :: acc) k)
   in
   helper l [] Fun.id
 ;;
@@ -72,4 +71,25 @@ let%expect_test "CPS map" =
 let%expect_test "CPS map" =
   print_list ~print_element:print_int (map_cps_revk factk [ 2; 4; 6 ]);
   [%expect {| 720 24 2 |}]
+;;
+
+
+
+(* Слава попросил сделать тест что это чудо что я наваял не перегружает стек чтбы убедиться что оно действиетльно CPS*)
+(*запускаем нашу чудо функцию на листе из 10_000_000 единичек, факториалем их все считайте получаем те же 10_000_000 единичек, но стак оверфлоу мы не получили*)
+let%expect_test "non-cps map causes stack overflow" =
+  let huge_list = List.init 10_000_000 (fun _ -> 1) in
+  try
+    ignore (map fact huge_list [])
+  with
+    | Stack_overflow -> print_endline "Stack overflow!";
+  [%expect.unreachable]
+;;
+
+
+let%expect_test "cps map handles large input safely" =
+  let huge_list = List.init 10_000_000 (fun _ -> 1) in
+  let result = map_cps_revk factk huge_list in
+  print_int (List.length result);
+  [%expect {| 10000000 |}]
 ;;
