@@ -42,6 +42,17 @@ let mapk f l =
   helperk l Fun.id
 ;;
 
+(*Dabzelosiqqq:::: я сдела разворот без конкатенации списков - он по идее работает медленно так что это тоже самое что и выше только через аккумулятор
+ПУТИ КАКАДУ НЕИСПОВЕДИМЫ МЫ ВСЕ УМРЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕЕМ*)
+let map_cps_revk f l=
+  let rec helper xs acc k =
+    match xs with
+    | [] -> k acc
+    | hd :: tl ->f hd (fun mapped_hd -> helper tl (mapped_hd :: acc) k)
+  in
+  helper l [] Fun.id
+;;
+
 (* тут важно условие на то, что f в CPS*)
 let rec fact x = if x = 1 then 1 else x * fact (x - 1)
 let rec factk x k = if x = 1 then k 1 else factk (x - 1) (fun s -> k (s * x))
@@ -53,5 +64,12 @@ let%expect_test "default map" =
 
 let%expect_test "CPS map" =
   print_list ~print_element:print_int (mapk (fun x -> factk x) [ 2; 4; 6 ]);
+  [%expect {| 720 24 2 |}]
+;;
+
+
+(*милый тестик показывающий что моя функция работает так же и ничем не хуже*)
+let%expect_test "CPS map" =
+  print_list ~print_element:print_int (map_cps_revk factk [ 2; 4; 6 ]);
   [%expect {| 720 24 2 |}]
 ;;
