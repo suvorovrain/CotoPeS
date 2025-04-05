@@ -33,15 +33,6 @@ let rec map f xs acc =
 
 (* CPS мапа от МАКСИМА РОДИОНОВА ЖЕСТКОГО ЧЕЛА ну и я сам подумал как перевернуть*)
 
-let mapk f l =
-  let rec helperk xs k =
-    match xs with
-    | [] -> k []
-    | hd :: tl -> helperk tl (fun s1 -> f hd (fun s2 -> k (s1 @ [ s2 ])))
-  in
-  helperk l Fun.id
-;;
-
 (*Dabzelosiqqq:::: я сдела разворот без конкатенации списков - он по идее работает медленно так что это тоже самое что и выше только через аккумулятор*)
 let map_cps_revk f l=
   let rec helper xs acc k =
@@ -62,7 +53,7 @@ let%expect_test "default map" =
 ;;
 
 let%expect_test "CPS map" =
-  print_list ~print_element:print_int (mapk (fun x -> factk x) [ 2; 4; 6 ]);
+  print_list ~print_element:print_int (map_cps_revk (fun x -> factk x) [ 2; 4; 6 ]);
   [%expect {| 720 24 2 |}]
 ;;
 
