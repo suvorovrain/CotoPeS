@@ -1,27 +1,26 @@
 (*принимает функцию из 'a->'b, возвращает функцию того же типа*)
 (* val memoize : ('a -> 'b) -> 'a -> 'b *)
-let memoize: ('a -> 'b) -> 'a -> 'b = fun f -> 
+let memoize : ('a -> 'b) -> 'a -> 'b =
+  fun f ->
   let open Base in
-
-	(* создаём таблицу где будем сохранять результаты *)
+  (* создаём таблицу где будем сохранять результаты *)
   let table = Hashtbl.Poly.create () in
   let new_fun x =
     match Hashtbl.find table x with
-		(* нашли в таблице вернём, то что нашли*)
+    (* нашли в таблице вернём, то что нашли*)
     | Some y -> y
-		
-		(* не нашли *)
+    (* не нашли *)
     | None ->
-			(* посчитали *)
+      (* посчитали *)
       let y = f x in
-			(* добавили в таблицу *)
+      (* добавили в таблицу *)
       Hashtbl.add_exn table ~key:x ~data:y;
-		  (* вернули посчитанное значение *)
+      (* вернули посчитанное значение *)
       y
   in
   new_fun
-  ;;
-  
+;;
+
 (*принимает функцию которая принимает функцию того же типа('a->'b), и возврашает функцию того же типа*)
 (*это мемоизация для открытых рекурсий вся соль в том что *)
 let memo_rec : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b =
@@ -37,7 +36,7 @@ let memo_rec : (('a -> 'b) -> 'a -> 'b) -> 'a -> 'b =
       let y = f new_fun x in
       Hashtbl.add_exn table ~key:x ~data:y;
       y
-  in  
+  in
   new_fun
 ;;
 
@@ -46,11 +45,11 @@ let time_it f x =
   let start = Sys.time () in
   let _ = f x in
   let finish = Sys.time () in
-  (finish -. start);
+  finish -. start
 ;;
 
 (*обычная реализация*)
-let rec fibo n = if n <= 1 then n else fibo (n-1) + fibo (n-2)
+let rec fibo n = if n <= 1 then n else fibo (n - 1) + fibo (n - 2)
 
 (* открытая рекурсия*)
 let fib_open self n = if n <= 1 then 1 else self (n - 1) + self (n - 2)
@@ -61,9 +60,8 @@ let memo_rec_fib = memo_rec fib_open
 (*обычная мемоизация*)
 let mem_fib = memoize fibo
 
-
 (*
-  видим что реализация мемоизированного фибоначи выполняется больше чем за 10 секунд первый раз
+   видим что реализация мемоизированного фибоначи выполняется больше чем за 10 секунд первый раз
   из теста видно что первый раз функция раотает долго (у меня 45секунд первый запуск и 0.00001 второй)
   но трейтий запуск от числа 49 все равно займет порядка 45 секунд тк результат не был мемоизирован, мемоизированно было только вычисление от 50
 let%expect_test "Compare execution time of stupid memoized fibo" =
@@ -135,17 +133,13 @@ let%expect_test "Compare execution time of stupid memoized fibo" =
     Third execution time: 0.000001 (reference: 1.000000)
     Acceptable time: execution took less then <= 1.00) |}]
 ;;
-
-
 *)
-
-
 
 (*тут можно запустить потыкаться, будет видно что 50 впервый раз у всех будет работать минуту,
  затем повторно у мемоизированных будет рабоать за 0~ а вот у обычной опять минуту*)
- (*при этом в третий раз мемоизация на 49 только у оптимизированного мемоийза будет быстро тк простой не сохранял все рекурсивные вызовы*)
+(*при этом в третий раз мемоизация на 49 только у оптимизированного мемоийза будет быстро тк простой не сохранял все рекурсивные вызовы*)
 (*
-let () = 
+   let () = 
   Printf.printf "Memoized\n";
   Printf.printf "%d\n" (time_it mem_fib 50);
   Printf.printf "NotMemoized\n";
@@ -171,30 +165,25 @@ let () =
 *)
 
 (*факториал*)
-let factorial_open self n = 
-  if n <= 1 then 1  
-  else n * self (n - 1)
-
+let factorial_open self n = if n <= 1 then 1 else n * self (n - 1)
 let fact_opt = memo_rec factorial_open
 
 (*сумма чисел от одного до n  *)
-let sum_open self n =
-  if n = 0 then 0
-  else n + self (n - 1)
-
+let sum_open self n = if n = 0 then 0 else n + self (n - 1)
 let memo_sum = memo_rec sum_open
-
 
 (*открытая рекурсия на функцию является ли число простым*)
 let is_prime_open self n =
-  if n <= 1 then false
-  else if n = 2 then true
-  else 
-    let check i = 
-      if i * i > n then true
-      else if n mod i = 0 then false
-      else self (i + 1)  (* Используем переданную self вместо прямой рекурсии *)
+  if n <= 1
+  then false
+  else if n = 2
+  then true
+  else (
+    let check i =
+      if i * i > n then true else if n mod i = 0 then false else self (i + 1)
+      (* Используем переданную self вместо прямой рекурсии *)
     in
-    check 2
+    check 2)
+;;
 
 let memo_is_prime = memo_rec is_prime_open

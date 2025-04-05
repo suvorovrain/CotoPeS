@@ -38,4 +38,4 @@ jobs:
               run: cd ${{ env.latest }} && opam exec -- dune build --profile=release
 
             - name: Running tests in ${{ env.latest }}...
-              run: cd ${{ env.latest }} && opam exec -- dune runtest --profile=release
+              run: cd ${{ env.latest }} && ulimit -s 8192 && opam exec -- dune runtest --profile=release
