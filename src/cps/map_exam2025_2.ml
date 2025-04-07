@@ -88,8 +88,6 @@ let%expect_test "cps map handles large input safely" =
   [%expect {| 10000000 |}]
 ;;
 
-
-
 (*тест что функция map_cps_rev реверсит список на небольшом списке*)
 let%expect_test "default cps map huge list" =
   (try
