@@ -33,12 +33,12 @@ let rec map f xs acc =
 
 (*Dabzelosiqqq :: сделал обычную мапу которая принимает f не в цпс и так же реверсит список снизу так же есть тест*)
 let map_cps_rev f l =
-  let rec helper xs k =
+  let rec helper xs acc k =
     match xs with
-    | [] -> k []
-    | hd :: tl -> helper tl (fun acc -> k (f hd :: acc))
+    | [] -> k acc
+    | hd :: tl -> helper tl (f hd :: acc) k
   in
-  helper l Fun.id
+  helper l [] Fun.id
 ;;
 
 (* CPS мапа от МАКСИМА РОДИОНОВА ЖЕСТКОГО ЧЕЛА ну и я сам подумал как перевернуть*)
@@ -88,13 +88,15 @@ let%expect_test "cps map handles large input safely" =
   [%expect {| 10000000 |}]
 ;;
 
+
+
 (*тест что функция map_cps_rev реверсит список на небольшом списке*)
 let%expect_test "default cps map huge list" =
   (try
      print_list_n ~print_element:print_int 5 (map_cps_rev (fun x -> fact x) [ 2; 4; 6 ])
    with
    | Stack_overflow -> print_endline "Stack overflow!");
-  [%expect {| 2 24 720 |}]
+  [%expect {| 720 24 2 |}]
 ;;
 
 (*тест что функция map_cps_rev не падает  на огромном списке*)
