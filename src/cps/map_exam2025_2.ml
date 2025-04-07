@@ -31,8 +31,17 @@ let rec map f xs acc =
   | hd :: tl -> map f tl (f hd :: acc)
 ;;
 
-(* CPS мапа от МАКСИМА РОДИОНОВА ЖЕСТКОГО ЧЕЛА ну и я сам подумал как перевернуть*)
+(*Dabzelosiqqq :: сделал обычную мапу которая принимает f не в цпс и так же реверсит список снизу так же есть тест*)
+let map_cps_rev f l =
+  let rec helper xs acc k =
+    match xs with
+    | [] -> k acc
+    | hd :: tl -> helper tl (f hd :: acc) k
+  in
+  helper l [] Fun.id
+;;
 
+(* CPS мапа от МАКСИМА РОДИОНОВА ЖЕСТКОГО ЧЕЛА ну и я сам подумал как перевернуть*)
 (*Dabzelosiqqq:::: я сдела разворот без конкатенации списков - он по идее работает медленно так что это тоже самое что и выше только через аккумулятор*)
 let map_cps_revk f l =
   let rec helper xs acc k =
@@ -77,4 +86,23 @@ let%expect_test "cps map handles large input safely" =
   let result = map_cps_revk factk huge_list in
   print_int (List.length result);
   [%expect {| 10000000 |}]
+;;
+
+(*тест что функция map_cps_rev реверсит список на небольшом списке*)
+let%expect_test "default cps map huge list" =
+  (try
+     print_list_n ~print_element:print_int 5 (map_cps_rev (fun x -> fact x) [ 2; 4; 6 ])
+   with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| 720 24 2 |}]
+;;
+
+(*тест что функция map_cps_rev не падает  на огромном списке*)
+let%expect_test "default cps map huge list" =
+  let huge_list = List.init 10_000_000 (fun _ -> 1) in
+  (try
+     print_list_n ~print_element:print_int 5 (map_cps_rev (fun x -> fact x) huge_list)
+   with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| 1 1 1 1 1 |}]
 ;;

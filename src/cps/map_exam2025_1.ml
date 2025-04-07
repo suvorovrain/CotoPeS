@@ -31,8 +31,17 @@ let rec map f xs =
   | hd :: tl -> f hd :: map f tl
 ;;
 
-(* CPS мапа от МАКСИМА РОДИОНОВА ЖЕСТКОГО ЧЕЛА*)
+(*Dabzelos: мапа в cps которая принимает обычную функцию*)
+let map_cps f l =
+  let rec helper xs k =
+    match xs with
+    | [] -> k []
+    | hd :: tl -> helper tl (fun r -> k (f hd :: r))
+  in
+  helper l Fun.id
+;;
 
+(* CPS мапа от МАКСИМА РОДИОНОВА ЖЕСТКОГО ЧЕЛА*)
 let mapk f l =
   let rec helperk xs k =
     match xs with
@@ -66,6 +75,13 @@ let%expect_test "default map huge list" =
 
 let%expect_test "CPS map huge list" =
   (try print_list_n ~print_element:print_int 5 (mapk (fun x -> factk x) huge_list) with
+   | Stack_overflow -> print_endline "Stack overflow!");
+  [%expect {| 1 1 1 1 1 |}]
+;;
+
+(*тут видно что обычный CPS который работает с обычной f тоже справляется и ведет себя так же*)
+let%expect_test "default cps map huge list" =
+  (try print_list_n ~print_element:print_int 5 (map_cps (fun x -> fact x) huge_list) with
    | Stack_overflow -> print_endline "Stack overflow!");
   [%expect {| 1 1 1 1 1 |}]
 ;;
