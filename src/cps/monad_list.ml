@@ -33,15 +33,25 @@ module ListCPS = struct
     | h :: tl -> mapk f tl (fun s -> k (f h :: s))
   ;;
 
+  let rec appendk l1 l2 k =
+    match l1 with
+    | [] -> l2
+    | h :: tl -> appendk tl l2 (fun s -> k (h :: s))
+  ;;
+
   let rec concatk xs k =
     match xs with
     | [] -> k []
-    | h :: tl -> concatk tl (fun s -> k (h @ s))
+    | h :: tl -> concatk tl (fun s1 -> appendk h s1 (fun s2 -> k s2))
   ;;
 
-  let bindk m f k = mapk f m (fun s -> concatk s k)
+  let bindk m f k = mapk f m (fun s1 -> concatk s1 (fun s2 -> k s2))
+
+  let bind m f = bindk m f (fun x -> x)
+
   let fail _ = []
 end
+
 
 (* вспомогательные функции *)
 
