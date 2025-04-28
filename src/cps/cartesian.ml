@@ -17,7 +17,7 @@ let rec mapk f l k =
 
 let rec appendk l1 l2 k =
   match l1 with
-  | [] -> l2
+  | [] -> k l2
   | h :: tl -> appendk tl l2 (fun s -> k (h :: s))
 ;;
 
