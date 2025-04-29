@@ -46,9 +46,7 @@ module ListCPS = struct
   ;;
 
   let bindk m f k = mapk f m (fun s1 -> concatk s1 (fun s2 -> k s2))
-
   let bind m f = bindk m f (fun x -> x)
-
   let fail _ = []
 end
 
