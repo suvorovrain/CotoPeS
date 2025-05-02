@@ -24,7 +24,7 @@ let rec appendk l1 l2 k =
 let rec concatk xs k =
   match xs with
   | [] -> k []
-  | h :: tl -> concatk tl (fun s1 -> appendk h s1 (fun s2 -> k s2))
+  | h :: tl -> concatk tl (fun s1 -> appendk h s1 k)
 ;;
 
 let cartesiank l1 l2 k =
